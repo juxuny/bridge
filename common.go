@@ -13,11 +13,6 @@ import (
 func init() {
 	rand.Seed(time.Now().Unix())
 	gob.Register(map[string]interface{}{})
-
-	go func () {
-		time.Sleep(60e9 * 10)
-		os.Exit(-1)
-	}()
 }
 
 var count = 0
