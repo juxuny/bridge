@@ -14,6 +14,7 @@ func StartMaster() {
 		log.Panic(e)
 	}
 	for {
+		log.Print("waiting for slave")
 		slave, e := l.Accept()
 		if e != nil {
 			log.Print(e)

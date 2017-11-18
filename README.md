@@ -1,2 +1,2 @@
 # bridge
-explore your localhost
+expose your localhost
