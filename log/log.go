@@ -16,6 +16,9 @@ type Writer struct {
 }
 
 func (t Writer) Write(data []byte) (r int, e error) {
+	if t.FileName == "" {
+		return os.Stdout.Write(data)
+	}
 	if t.f != nil {
 		return t.f.Write(data)
 	}

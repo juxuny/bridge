@@ -30,6 +30,6 @@ func init() {
 	flag.Parse()
 
 	w = L.Writer{FileName: config.LogFile}
-	log = sl.New(w, "", sl.Ldate|sl.Ltime|sl.Lshortfile|sl.LUTC)
+	log = sl.New(w, "", sl.Ldate|sl.Ltime|sl.Lshortfile)
 	//log.Init(config.LogFile)
 }

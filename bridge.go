@@ -63,6 +63,7 @@ func service() {
 		}
 		clientConnManagement.Add(client.RemoteAddr().String(), client)
 		bindManagement.Bind(client.RemoteAddr().String(), slave.RemoteAddr().String())
+		//log.Print("accept from client, ", client.RemoteAddr().String())
 		go handleClient(client)
 	}
 }
@@ -83,6 +84,7 @@ func handleClient(client net.Conn) {
 		return
 	}
 	for {
+		log.Print("waiting data from client.")
 		n, e := client.Read(data)
 		if e != nil {
 			e = slaveConnManagement.SendPack(slaveAddr, Pack{Method:"Close", Data: map[string]interface{}{"clientAddr": clientAddr}})
