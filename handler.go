@@ -34,6 +34,10 @@ func (h MasterHandler) Close(m map[string]interface{}) (r int) {
 	return
 }
 
+func (h MasterHandler) Test(m map[string]interface{}) (r int) {
+	log.Print("on test")
+	return
+}
 
 func (h MasterHandler) run(p Pack) {
 	t := reflect.ValueOf(h)

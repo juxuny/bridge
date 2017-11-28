@@ -3,6 +3,8 @@ package bridge
 import (
 	"fmt"
 	"net"
+	"math/rand"
+	"time"
 )
 
 
@@ -112,6 +114,17 @@ func StartSlave() {
 		return
 	}
 	log.Printf("start slave, master: %s", config.MasterAddr)
+	go func () {
+		for {
+			e = sendPack(masterConn, Pack{Method: "Test", Data: map[string]interface{}{"random": rand.Int()}})
+			if e != nil {
+				log.Print(e)
+				break
+			}
+			log.Print("test success")
+			time.Sleep(5e9)
+		}
+	}()
 	for {
 		p, e := readPack(masterConn)
 		if e != nil {

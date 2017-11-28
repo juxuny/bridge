@@ -10,6 +10,10 @@ import (
 	"fmt"
 )
 
+const (
+	READ_TIMEOUT = 20
+)
+
 func init() {
 	rand.Seed(time.Now().Unix())
 	gob.Register(map[string]interface{}{})
@@ -35,6 +39,7 @@ func sendPack(conn net.Conn, p Pack) (e error) {
 
 func readPack(conn net.Conn) (p Pack, e error) {
 	buf := make([]byte, 1)
+	//conn.SetDeadline(time.Now().Add(time.Duration(READ_TIMEOUT*time.Second)))
 	_, e = conn.Read(buf)
 	if e != nil {
 		return
@@ -47,6 +52,7 @@ func readPack(conn net.Conn) (p Pack, e error) {
 	}
 	//get a start flag
 	buf = make([]byte, 4)
+	//conn.SetDeadline(time.Now().Add(time.Duration(READ_TIMEOUT*time.Second)))
 	_, e = conn.Read(buf)
 	if e != nil {
 		return
