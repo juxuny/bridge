@@ -17,7 +17,10 @@ func init() {
 var count = 0
 
 func sendPack(conn net.Conn, p Pack) (e error) {
-
+	if conn == nil {
+		e = fmt.Errorf("invalid connection")
+		return
+	}
 	data, e := pack(p)
 	if e != nil {
 		return
@@ -32,6 +35,10 @@ func sendPack(conn net.Conn, p Pack) (e error) {
 }
 
 func readPack(conn net.Conn) (p Pack, e error) {
+	if conn == nil {
+		e = fmt.Errorf("invalid connection")
+		return
+	}
 	buf := make([]byte, 4)
 	_, e = conn.Read(buf)
 	if e != nil {
@@ -40,9 +47,9 @@ func readPack(conn net.Conn) (p Pack, e error) {
 	dataLen := binary.BigEndian.Uint32(buf)
 	buf = make([]byte, dataLen)
 	var current uint32 = 0
-	tmp := make([]byte, dataLen)
-	var n int
 	for current < dataLen {
+		tmp := make([]byte, dataLen - current)
+		var n int
 		n, e = conn.Read(tmp)
 		if e != nil {
 			return

@@ -114,7 +114,7 @@ func StartSlave() {
 	}
 	log.Printf("start slave, master: %s", config.MasterAddr)
 	go func () {
-		for {
+		for masterConn != nil {
 			e = sendPack(masterConn, Pack{Method: "Test", Data: map[string]interface{}{"random": "123456"}})
 			if e != nil {
 				log.Print(e)
