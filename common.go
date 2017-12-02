@@ -6,6 +6,7 @@ import (
 	"time"
 	"math/rand"
 	"encoding/gob"
+	"fmt"
 )
 
 func init() {
@@ -38,10 +39,24 @@ func readPack(conn net.Conn) (p Pack, e error) {
 	}
 	dataLen := binary.BigEndian.Uint32(buf)
 	buf = make([]byte, dataLen)
-	_, e = conn.Read(buf)
-	if e != nil {
-		return
+	var current uint32 = 0
+	tmp := make([]byte, dataLen)
+	var n int
+	for current < dataLen {
+		n, e = conn.Read(tmp)
+		if e != nil {
+			return
+		}
+		for i := 0; i < n; i++ {
+			buf[current] = tmp[i]
+			current++
+			if current > dataLen {
+				e = fmt.Errorf("invaild package")
+				return
+			}
+		}
 	}
+
 	log.Printf("read size: %d", dataLen)
 	p, e = unpack(buf)
 	if e != nil {
