@@ -6,13 +6,6 @@ import (
 	"time"
 	"math/rand"
 	"encoding/gob"
-	"os"
-	"fmt"
-)
-
-const (
-	READ_TIMEOUT = 20
-	PACKAGE_LEN = 10 * (1<<20)
 )
 
 func init() {
@@ -38,30 +31,12 @@ func sendPack(conn net.Conn, p Pack) (e error) {
 }
 
 func readPack(conn net.Conn) (p Pack, e error) {
-	//buf := make([]byte, 1)
-	////conn.SetDeadline(time.Now().Add(time.Duration(READ_TIMEOUT*time.Second)))
-	//_, e = conn.Read(buf)
-	//if e != nil {
-	//	return
-	//}
-	//for buf[0] != START {
-	//	_, e = conn.Read(buf)
-	//	if e != nil {
-	//		return
-	//	}
-	//}
-	//get a start flag
 	buf := make([]byte, 4)
-	//conn.SetDeadline(time.Now().Add(time.Duration(READ_TIMEOUT*time.Second)))
 	_, e = conn.Read(buf)
 	if e != nil {
 		return
 	}
 	dataLen := binary.BigEndian.Uint32(buf)
-	//if dataLen > 50000 {
-	//	e = fmt.Errorf("pack is too large, %d", dataLen)
-	//	return
-	//}
 	buf = make([]byte, dataLen)
 	_, e = conn.Read(buf)
 	if e != nil {
@@ -82,13 +57,4 @@ func merge(data ...[]byte) (r []byte) {
 		}
 	}
 	return
-}
-
-func dump(data []byte) {
-	f, e := os.OpenFile(fmt.Sprintf("F:\\tmp\\data_%d.dat", count), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
-	if e != nil {
-		return
-	}
-	defer f.Close()
-	f.Write(data)
 }
