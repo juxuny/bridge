@@ -9,7 +9,11 @@ import (
 
 func StartMaster() {
 	log.Printf("start master, listen :%d", config.MasterPort)
-	go service()
+	go func () {
+		for {
+			service()
+		}
+	}()
 	l, e := net.Listen("tcp", fmt.Sprintf(":%d", config.MasterPort))
 	if e != nil {
 		log.Panic(e)
@@ -49,11 +53,13 @@ func service() {
 	if e != nil {
 		log.Panic(e)
 	}
+	defer l.Close()
 	log.Printf("service port: %d", config.ServicePort)
 	for {
 		client, e := l.Accept()
 		if e != nil {
-			log.Panic(e)
+			log.Print(e)
+			break
 		}
 		log.Print("accept from: " + client.RemoteAddr().String())
 		slave, e := slaveConnManagement.RandConn()
