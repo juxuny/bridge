@@ -110,6 +110,7 @@ func handleClient(client net.Conn) {
 }
 
 var masterConn net.Conn
+var enableTest = false
 
 func StartSlave() {
 	var e error
@@ -119,8 +120,12 @@ func StartSlave() {
 		return
 	}
 	log.Printf("start slave, master: %s", config.MasterAddr)
+	enableTest = true
+	defer func () {
+		enableTest = false
+	}()
 	go func () {
-		for masterConn != nil {
+		for masterConn != nil && enableTest {
 			e = sendPack(masterConn, Pack{Method: "Test", Data: map[string]interface{}{"random": "123456"}})
 			if e != nil {
 				log.Print(e)
