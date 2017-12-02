@@ -19,6 +19,7 @@ var w L.Writer
 var config Config
 
 const DATA_LEN = 10 * (1 << 20)
+//const DATA_LEN  = 10000
 
 func init() {
 
