@@ -12,6 +12,7 @@ import (
 
 const (
 	READ_TIMEOUT = 20
+	PACKAGE_LEN = 10 * (1<<20)
 )
 
 func init() {
@@ -30,38 +31,37 @@ func sendPack(conn net.Conn, p Pack) (e error) {
 	dataLen := len(data)
 	buf := make([]byte, 4)
 	binary.BigEndian.PutUint32(buf, uint32(dataLen))
-	_, e = conn.Write(merge([]byte{START}, buf, data))
-	//log.Printf("Data: %02x %02x %02x", []byte{START}, buf, data)
+	_, e = conn.Write(merge(buf, data))
 	log.Printf("count: %d", count)
 	count++
 	return
 }
 
 func readPack(conn net.Conn) (p Pack, e error) {
-	buf := make([]byte, 1)
-	//conn.SetDeadline(time.Now().Add(time.Duration(READ_TIMEOUT*time.Second)))
-	_, e = conn.Read(buf)
-	if e != nil {
-		return
-	}
-	for buf[0] != START {
-		_, e = conn.Read(buf)
-		if e != nil {
-			return
-		}
-	}
+	//buf := make([]byte, 1)
+	////conn.SetDeadline(time.Now().Add(time.Duration(READ_TIMEOUT*time.Second)))
+	//_, e = conn.Read(buf)
+	//if e != nil {
+	//	return
+	//}
+	//for buf[0] != START {
+	//	_, e = conn.Read(buf)
+	//	if e != nil {
+	//		return
+	//	}
+	//}
 	//get a start flag
-	buf = make([]byte, 4)
+	buf := make([]byte, 4)
 	//conn.SetDeadline(time.Now().Add(time.Duration(READ_TIMEOUT*time.Second)))
 	_, e = conn.Read(buf)
 	if e != nil {
 		return
 	}
 	dataLen := binary.BigEndian.Uint32(buf)
-	if dataLen > 50000 {
-		e = fmt.Errorf("pack is too large, %d", dataLen)
-		return
-	}
+	//if dataLen > 50000 {
+	//	e = fmt.Errorf("pack is too large, %d", dataLen)
+	//	return
+	//}
 	buf = make([]byte, dataLen)
 	_, e = conn.Read(buf)
 	if e != nil {
