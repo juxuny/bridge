@@ -92,6 +92,7 @@ func handleClient(client net.Conn) {
 	}
 	for {
 		log.Print("waiting data from client.")
+		client.SetReadDeadline(time.Now().Add(time.Duration(TIMEOUT_DURATION*time.Second)))
 		n, e := client.Read(data)
 		if e != nil {
 			e = slaveConnManagement.SendPack(slaveAddr, Pack{Method:"Close", Data: map[string]interface{}{"clientAddr": clientAddr}})

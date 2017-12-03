@@ -20,6 +20,7 @@ var config Config
 
 const DATA_LEN = 1 << 20
 //const DATA_LEN  = 10000
+const TIMEOUT_DURATION = 30
 
 func init() {
 
