@@ -90,8 +90,9 @@ func (t BindManagement) Unbind(clientAddr string) {
 func (t BindManagement) Clear(slaveAddr string) {
 	for clientAddr, s := range t {
 		if s == slaveAddr {
-			clientConnManagement.Remove(clientAddr)
-			delete(t, clientAddr)
+			//clientConnManagement.Remove(clientAddr)
+			//delete(t, clientAddr)
+			t.Unbind(clientAddr)
 		}
 	}
 }

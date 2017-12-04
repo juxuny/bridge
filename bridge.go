@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"time"
+	"math/rand"
 )
 
 
@@ -120,6 +121,7 @@ func StartSlave() {
 		log.Print(e)
 		return
 	}
+	defer masterConn.Close()
 	log.Printf("start slave, master: %s", config.MasterAddr)
 	enableTest = true
 	defer func () {
@@ -127,7 +129,7 @@ func StartSlave() {
 	}()
 	go func () {
 		for masterConn != nil && enableTest {
-			e = sendPack(masterConn, Pack{Method: "Test", Data: map[string]interface{}{"random": "123456"}})
+			e = sendPack(masterConn, Pack{Method: "Test", Data: map[string]interface{}{"random": fmt.Sprintf("%d", rand.Int())}})
 			if e != nil {
 				log.Print(e)
 				break

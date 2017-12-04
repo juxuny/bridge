@@ -40,7 +40,8 @@ func readPack(conn net.Conn) (p Pack, e error) {
 		return
 	}
 	buf := make([]byte, 4)
-	conn.SetReadDeadline(time.Now().Add(time.Duration(TIMEOUT_DURATION*time.Second)))
+	//conn.SetReadDeadline(time.Now().Add(time.Duration(TIMEOUT_DURATION*time.Second)))
+	//defer conn.SetReadDeadline(time.Time{})
 	_, e = conn.Read(buf)
 	if e != nil {
 		return
@@ -51,7 +52,7 @@ func readPack(conn net.Conn) (p Pack, e error) {
 	for current < dataLen {
 		tmp := make([]byte, dataLen - current)
 		var n int
-		conn.SetReadDeadline(time.Now().Add(time.Duration(TIMEOUT_DURATION*time.Second)))
+		//conn.SetReadDeadline(time.Now().Add(time.Duration(TIMEOUT_DURATION*time.Second)))
 		n, e = conn.Read(tmp)
 		if e != nil {
 			return
