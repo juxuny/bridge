@@ -1,36 +1,47 @@
 package bridge
 
 import (
-	"flag"
-	L "github.com/juxuny/bridge/log"
-	sl "log"
+	"encoding/json"
+	"io/ioutil"
 )
 
-type Config struct {
-	MasterPort int
-	ServicePort int
-	MasterAddr string
-	DstAddr string
-	LogFile string
+type ServerConfig struct {
+	Port      int    `json:"port"`
+	TokenConf string `json:"tokenConf"`
 }
 
-var log *sl.Logger
-var w L.Writer
-var config Config
+func ParseServerConfig(fileName string) (config ServerConfig, e error) {
+	content, e := ioutil.ReadFile(fileName)
+	if e != nil {
+		panic(e)
+	}
+	e = json.Unmarshal(content, &config)
+	if e != nil {
+		panic(e)
+	}
+	return
+}
 
-const DATA_LEN = 1 << 20
-//const DATA_LEN  = 10000
-const TIMEOUT_DURATION = 30
+//func NewServerConfig() (ret ServerConfig) {
+//	ret.Port = 9090
+//	return
+//}
 
-func init() {
+type ClientConfig struct {
+	Token string `json:"token"`
+	Key   string `json:"key"`
+	Host  string `json:"host"`
+	Local string `json:"local"`
+}
 
-	flag.StringVar(&config.DstAddr, "dst", "127.0.0.1:80", "dst address")
-	flag.StringVar(&config.MasterAddr, "master", "127.0.0.1:8181", "master address")
-	flag.IntVar(&config.MasterPort, "port", 8181, "master port")
-	flag.IntVar(&config.ServicePort, "service-port", 9999, "service port")
-	flag.StringVar(&config.LogFile, "log", "bridge.log", "log file name")
-	flag.Parse()
-
-	w = L.Writer{FileName: config.LogFile}
-	log = sl.New(w, "", sl.Ldate|sl.Ltime|sl.Lshortfile)
+func ParseClientConfig(fileName string) (config ClientConfig, e error) {
+	content, e := ioutil.ReadFile(fileName)
+	if e != nil {
+		panic(e)
+	}
+	e = json.Unmarshal(content, &config)
+	if e != nil {
+		panic(e)
+	}
+	return
 }
