@@ -4,15 +4,14 @@ const (
 
 	//cmd|length|token
 	CmdAuth   = 1
-	//CmdSetKey = 2
 	// cmd|length|from|to|bytes
-	CmdData   = 3
+	CmdData   = 2
 	// cmd|length|string
-	CmdMsg = 4
+	CmdMsg = 3
 	// cmd|length|address
-	CmdConnect = 5
+	CmdConnect = 4
 	// cmd|length|address
-	CmdClose = 6
+	CmdClose = 5
 )
 
 const (
@@ -22,7 +21,6 @@ const (
 	FlagEsc    = 0xF0
 	FlagEscEsc = 0xFF
 )
-
 
 const (
 	EmptyAddress = "0.0.0.0:0"

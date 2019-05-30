@@ -36,18 +36,8 @@ func (t *Data) Pack() (ret []byte, e error) {
 }
 
 func (t *Data) Unpack(data []byte) (e error) {
-	//cmd
-	t.Cmd = 0
-	t.Cmd |= int16(data[0] << 8)
-	t.Cmd |= int16(data[1])
 
-	//length
-	length := 0
-	length |= int(data[2]) << 24
-	length |= int(data[3]) << 16
-	length |= int(data[4]) << 8
-	length |= int(data[5])
-	in := bytes.NewBuffer(data[6:])
+	in := bytes.NewBuffer(data)
 	out := bytes.NewBuffer(nil)
 	for b, err := in.ReadByte(); err == nil; b, err = in.ReadByte() {
 		if b == FlagEsc {
@@ -64,10 +54,23 @@ func (t *Data) Unpack(data []byte) (e error) {
 			out.WriteByte(b)
 		}
 	}
-	if out.Len() != length {
-		return fmt.Errorf("invalid package")
+	data = out.Bytes()
+	//cmd
+	t.Cmd = 0
+	t.Cmd |= int16(data[0] << 8)
+	t.Cmd |= int16(data[1])
+
+	//length
+	length := 0
+	length |= int(data[2]) << 24
+	length |= int(data[3]) << 16
+	length |= int(data[4]) << 8
+	length |= int(data[5])
+
+	if out.Len() - 6 != length {
+		return fmt.Errorf("invalid package, get data: %d, read length: %d", out.Len(), length)
 	}
-	t.Data = out.Bytes()
+	t.Data = data[6:]
 	return
 }
 
