@@ -175,7 +175,7 @@ func (t *Server) serveConn(port int, conn net.Conn) {
 func (t *Server) serveSlave(port int, reader *DataReader) {
 	debug("serve slave:", reader.conn.RemoteAddr())
 	debug("listen for slave, port:", port)
-	ln, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
+	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		debug(err)
 		t.sendMsg(port, err.Error())
