@@ -1,0 +1,14 @@
+version: "3.4"
+services:
+  client-server:
+    logging:
+      options:
+        max-size: "10M"
+    build: 
+      context: .
+      dockerfile: bridge.dockerfile
+      args:
+        GOPATH: /gopath
+    restart: always
+    environment:
+      - GOPATH=/gopath
