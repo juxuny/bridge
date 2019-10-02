@@ -1,6 +1,6 @@
 {
   "token": "k3oWYu86IYqZTq1n80rlCqnlxS9tNo3wKbgmRRAXHCy15x1e26gocDqkPLbu1Unes1RHogw67INiGVUbjAtwfYeaIlTiOfxqDm1CC1hSs0Fh7mV1yxRAcDnu5R9iaDcV",
   "key": "KGQ78JAyWfmk1WGn",
-  "host": "192.168.1.100:9090",
+  "host": "192.168.1.101:9090",
   "local": "192.168.1.6:8080"
 }
