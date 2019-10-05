@@ -168,7 +168,8 @@ func (t *Client) startTickRunner() {
 	for {
 		time.Sleep(time.Second*5)
 		if err := t.sendTick(); err != nil {
-			panic(err)
+			info(err)
+			break
 		}
 	}
 }

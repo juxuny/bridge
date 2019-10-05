@@ -80,18 +80,23 @@ func (t *Server) checkAuthorization(conn net.Conn) {
 		_ = conn.Close()
 		return
 	}
+	var disconnected bool
 	port, found := t.tokenManager.GetPortByToken(string(d.Data))
+	t.bindPort(port, conn)
 	if !found {
 		_, _ = log("invalid token:", string(d.Data))
+		disconnected, e = t.sendMsg(port, "invalid token")
+		t.unbindPort(port)
+		_ = conn.Close()
+	} else {
+		disconnected, e = t.sendMsg(port, "authorized success")
 	}
-	t.bindPort(port, conn)
-	disconnected, e := t.sendMsg(port, "authorized success")
 	if e != nil {
-		log(e)
+		_ ,_ = log(e)
 		return
 	}
 	if disconnected {
-		log("slave disconnected:", port)
+		info("slave disconnected:", port)
 		return
 	}
 	go t.serveSlave(port, reader)
