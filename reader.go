@@ -35,7 +35,7 @@ func (t *DataReader) ReadOne() (ret Data, isEnd bool, e error) {
 			}
 			t.buffer.Write(block[:n])
 		}
-		debug("buffer data:", t.buffer.Len(), t.buffer.Bytes())
+		//debug("buffer data:", t.buffer.Len(), t.buffer.Bytes())
 		b, err := t.buffer.ReadByte()
 		if err != nil {
 			continue

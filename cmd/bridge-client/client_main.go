@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/juxuny/bridge"
+	"runtime/debug"
 )
 
 var (
@@ -19,6 +21,19 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
+	for {
+		startClient(c)
+	}
+}
+
+func startClient(c bridge.ClientConfig) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println(err)
+			debug.PrintStack()
+			return
+		}
+	}()
 	client := bridge.NewClient(c)
 	client.Start()
 }

@@ -11,8 +11,12 @@ var log = fmt.Println
 
 func debug(v ...interface{}) {
 	if verbose {
-		log(v...)
+		_, _ = log(v...)
 	}
+}
+
+func info(v ...interface{}) {
+	_, _ = log(v...)
 }
 
 //func debugf(format string, v ...interface{}) {

@@ -1,7 +1,9 @@
 package bridge
 
 import (
+	"fmt"
 	"net"
+	"time"
 )
 
 type Client struct {
@@ -27,7 +29,7 @@ func (t *Client) sendAuthorization() {
 	if err != nil {
 		panic(err)
 	}
-	log("send authorization finished")
+	info("send authorization finished")
 }
 
 func (t *Client) handleConnect(d Data) {
@@ -77,7 +79,13 @@ func (t *Client) handleClose(d Data) {
 
 func (t *Client) handleMsg(d Data) {
 	msg := string(d.Data)
-	log(msg)
+	info(msg)
+}
+
+// handle heartbeat
+func (t *Client) handleTick(d Data) {
+	msg := string(d.Data)
+	info(msg)
 }
 
 func (t *Client) handleData(d Data) {
@@ -115,6 +123,16 @@ func (t *Client) sendClose(addr string) (e error) {
 	return
 }
 
+func (t *Client) sendTick() (e error) {
+	d := Data{}
+	d.Cmd = CmdTick
+	timestamp := fmt.Sprint(time.Now().UnixNano())
+	d.Data = make([]byte, len(timestamp))
+	copy(d.Data, timestamp)
+	e = d.Write(t.conn)
+	return
+}
+
 
 func (t *Client) sendData(addr string, data []byte) (e error) {
 	fromBytes, e := hostToBytes(addr)
@@ -146,6 +164,15 @@ func (t *Client) sendData(addr string, data []byte) (e error) {
 	return
 }
 
+func (t *Client) startTickRunner() {
+	for {
+		time.Sleep(time.Second*5)
+		if err := t.sendTick(); err != nil {
+			panic(err)
+		}
+	}
+}
+
 func (t *Client) Start() {
 	var err error
 	t.conn, err = net.Dial("tcp", t.config.Host)
@@ -154,6 +181,7 @@ func (t *Client) Start() {
 	}
 	t.sendAuthorization()
 	reader := NewDataReader(t.conn)
+	go t.startTickRunner()
 	for {
 		d, isEnd, err := reader.ReadOne()
 		if err != nil {
@@ -171,6 +199,8 @@ func (t *Client) Start() {
 			t.handleConnect(d)
 		case CmdClose:
 			t.handleClose(d)
+		case CmdTick:
+			t.handleTick(d)
 		}
 	}
 }

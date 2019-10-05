@@ -12,6 +12,8 @@ const (
 	CmdConnect = 4
 	// cmd|length|address
 	CmdClose = 5
+	// cmd|length|string
+	CmdTick = 6
 )
 
 const (
