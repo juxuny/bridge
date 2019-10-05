@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/juxuny/bridge"
 	"runtime/debug"
+	"time"
 )
 
 var (
@@ -23,6 +24,7 @@ func main() {
 	}
 	for {
 		startClient(c)
+		time.Sleep(time.Second*3)
 	}
 }
 
