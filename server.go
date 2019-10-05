@@ -98,19 +98,19 @@ func (t *Server) checkAuthorization(conn net.Conn) {
 }
 
 
-func (t *Server) sendMsg(port int, msg string) (disconnected bool, e error){
+func (t *Server) sendMsg(port int, msg string) (disconnected bool, e error) {
 	disconnected, e = t.slaves.sendMsg(port, msg)
 	return
 }
 
 func (t *Server) handleMsg(d Data) {
-	log(string(d.Data))
+	info(string(d.Data))
 }
 
 func (t *Server) handleClose(d Data) {
 	addr, err := bytesToHost(d.Data)
 	if err != nil {
-		log("invalid address:", err)
+		debug("invalid address:", err)
 		return
 	}
 	t.connMgr.Close(addr)
@@ -120,7 +120,7 @@ func (t *Server) handleData(d Data) {
 	debug("handleData:", d)
 	addr, err := bytesToHost(d.Data[0:8])
 	if err != nil {
-		log("invalid address:", err)
+		debug("invalid address:", err)
 		return
 	}
 	disconnected, err := t.connMgr.SendData(addr, d.Data[16:])
@@ -132,6 +132,10 @@ func (t *Server) handleData(d Data) {
 	}
 }
 
+func (t *Server) handleTick(d Data){
+	debug("handleTick: ", d)
+}
+
 func (t *Server) handle(d Data) {
 	switch d.Cmd {
 	case CmdMsg:
@@ -140,6 +144,8 @@ func (t *Server) handle(d Data) {
 		t.handleData(d)
 	case CmdClose:
 		t.handleClose(d)
+	case CmdTick:
+		t.handleTick(d)
 	}
 }
 
