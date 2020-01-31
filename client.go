@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+
 type Client struct {
 	config ClientConfig
 	conn net.Conn
@@ -25,6 +26,7 @@ func (t *Client) sendAuthorization() {
 	d := Data{}
 	d.Cmd = CmdAuth
 	d.Data = []byte(t.config.Token)
+	_ = t.conn.SetWriteDeadline(time.Now().Add(timeout))
 	err := d.Write(t.conn)
 	if err != nil {
 		panic(err)
@@ -38,7 +40,7 @@ func (t *Client) handleConnect(d Data) {
 		debug(err)
 		return
 	}
-	conn, err := net.Dial("tcp", t.config.Local)
+	conn, err := net.DialTimeout("tcp", t.config.Local, timeout)
 	if err != nil {
 		debug(err)
 		return
@@ -51,6 +53,7 @@ func (t *Client) handleConnect(d Data) {
 func (t *Client) serveConn(addr string, conn net.Conn) {
 	buffer := make([]byte, blockSize)
 	for {
+
 		n, err := conn.Read(buffer)
 		if err != nil {
 			debug("Client.serveConn read error:", err)
@@ -119,6 +122,7 @@ func (t *Client) sendClose(addr string) (e error) {
 	d.Cmd = CmdClose
 	d.Data = make([]byte, len(addrBytes))
 	copy(d.Data, addrBytes)
+	_ = t.conn.SetWriteDeadline(time.Now().Add(timeout))
 	e = d.Write(t.conn)
 	return
 }
@@ -129,6 +133,7 @@ func (t *Client) sendTick() (e error) {
 	timestamp := fmt.Sprint(time.Now().UnixNano())
 	d.Data = make([]byte, len(timestamp))
 	copy(d.Data, timestamp)
+	_ = t.conn.SetWriteDeadline(time.Now().Add(timeout))
 	e = d.Write(t.conn)
 	return
 }
@@ -160,6 +165,7 @@ func (t *Client) sendData(addr string, data []byte) (e error) {
 		d.Data[k] = data[i]
 		k++
 	}
+	_ = t.conn.SetWriteDeadline(time.Now().Add(timeout))
 	e = d.Write(t.conn)
 	return
 }

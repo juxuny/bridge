@@ -1,5 +1,7 @@
 package bridge
 
+import "time"
+
 const (
 
 	//cmd|length|token
@@ -26,4 +28,8 @@ const (
 
 const (
 	EmptyAddress = "0.0.0.0:0"
+)
+
+const (
+	timeout = time.Second
 )
