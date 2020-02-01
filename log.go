@@ -21,7 +21,7 @@ func debug(v ...interface{}) {
 }
 
 func info(v ...interface{}) {
-	logger.Info(v...)
+	_logger.Info(v...)
 }
 
 //func debugf(format string, v ...interface{}) {

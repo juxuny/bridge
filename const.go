@@ -30,6 +30,11 @@ const (
 	EmptyAddress = "0.0.0.0:0"
 )
 
-const (
+
+var (
 	timeout = 3 * time.Second
 )
+
+func SetTimeout(duration time.Duration) {
+	timeout = duration
+}

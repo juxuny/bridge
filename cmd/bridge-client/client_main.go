@@ -10,11 +10,14 @@ import (
 
 var (
 	configFile = "client.json"
+	timeout int64 = 3 // second
 )
 
 func init() {
 	flag.StringVar(&configFile, "c", "client.json", "config file")
+	flag.Int64Var(&timeout, "t", 3, "timeout in second")
 	flag.Parse()
+	bridge.SetTimeout(time.Duration(timeout)*time.Second)
 }
 
 func main() {
