@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -13,17 +14,21 @@ type Client struct {
 	conn net.Conn
 
 	connMgr *ConnManager
+	*sync.Mutex
 }
 
 func NewClient(c ClientConfig) (ret *Client) {
 	ret = new(Client)
 	ret.config = c
 	ret.connMgr = NewConnManager()
+	ret.Mutex = &sync.Mutex{}
 	return
 }
 
 
 func (t *Client) sendAuthorization() {
+	t.Lock()
+	defer t.Unlock()
 	d := Data{}
 	d.Cmd = CmdAuth
 	d.Data = []byte(t.config.Token)
@@ -114,6 +119,8 @@ func (t *Client) handleData(d Data) {
 }
 
 func (t *Client) sendClose(addr string) (e error) {
+	t.Lock()
+	defer t.Unlock()
 	addrBytes, err := hostToBytes(addr)
 	if err != nil {
 		debug(err)
@@ -129,6 +136,8 @@ func (t *Client) sendClose(addr string) (e error) {
 }
 
 func (t *Client) sendTick() (e error) {
+	t.Lock()
+	defer t.Unlock()
 	d := Data{}
 	d.Cmd = CmdTick
 	timestamp := fmt.Sprint(time.Now().UnixNano())
@@ -141,6 +150,8 @@ func (t *Client) sendTick() (e error) {
 
 
 func (t *Client) sendData(addr string, data []byte) (e error) {
+	t.Lock()
+	defer t.Unlock()
 	fromBytes, e := hostToBytes(addr)
 	if e != nil {
 		return
