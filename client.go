@@ -3,6 +3,7 @@ package bridge
 import (
 	"fmt"
 	"net"
+	"os"
 	"time"
 )
 
@@ -178,6 +179,7 @@ func (t *Client) startTickRunner() {
 			break
 		}
 	}
+	os.Exit(-1) //心跳失败，结束进程
 }
 
 func (t *Client) Start() {
