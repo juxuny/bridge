@@ -1,22 +1,26 @@
 package bridge
 
 import (
-	"fmt"
+	ler "github.com/juxuny/bridge/log"
 )
 
 var verbose bool
 
-var log = fmt.Println
+var logger = ler.NewLogger("[MAIN]")
+
+var log = func(v ...interface{}) {
+	logger.Debug(v...)
+}
 //var logf = fmt.Printf
 
 func debug(v ...interface{}) {
 	if verbose {
-		_, _ = log(v...)
+		log(v...)
 	}
 }
 
 func info(v ...interface{}) {
-	_, _ = log(v...)
+	logger.Info(v...)
 }
 
 //func debugf(format string, v ...interface{}) {

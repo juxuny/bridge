@@ -43,7 +43,7 @@ func (t *Server) Start() {
 	if e != nil {
 		panic(e)
 	}
-	_, _ = log("listen on :", t.config.Port)
+	log("listen on :", t.config.Port)
 	for {
 		conn, e := t.ln.Accept()
 		if e != nil {
@@ -68,7 +68,7 @@ func (t *Server) checkAuthorization(conn net.Conn) {
 	debug("get authorization:", conn.RemoteAddr())
 	d, isEnd, e := reader.ReadOne()
 	if e != nil {
-		_, _ = log("read data error:", e)
+		log("read data error:", e)
 	}
 	if isEnd {
 		_ = conn.Close()
@@ -76,7 +76,7 @@ func (t *Server) checkAuthorization(conn net.Conn) {
 	}
 
 	if d.Cmd != CmdAuth {
-		_, _ = log("incorrect cmd:", d.Cmd)
+		log("incorrect cmd:", d.Cmd)
 		_ = conn.Close()
 		return
 	}
@@ -84,7 +84,7 @@ func (t *Server) checkAuthorization(conn net.Conn) {
 	port, found := t.tokenManager.GetPortByToken(string(d.Data))
 	t.bindPort(port, conn)
 	if !found {
-		_, _ = log("invalid token:", string(d.Data))
+		log("invalid token:", string(d.Data))
 		disconnected, e = t.sendMsg(port, "invalid token")
 		t.unbindPort(port)
 		_ = conn.Close()
@@ -92,7 +92,7 @@ func (t *Server) checkAuthorization(conn net.Conn) {
 		disconnected, e = t.sendMsg(port, "authorized success")
 	}
 	if e != nil {
-		_ ,_ = log(e)
+		log(e)
 		return
 	}
 	if disconnected {
@@ -125,12 +125,12 @@ func (t *Server) handleData(d Data) {
 	debug("handleData:", d)
 	addr, err := bytesToHost(d.Data[0:8])
 	if err != nil {
-		debug("invalid address:", err)
+		logger.Error("invalid address:", err)
 		return
 	}
 	disconnected, err := t.connMgr.SendData(addr, d.Data[16:])
 	if err != nil {
-		debug("invalid connection:", err)
+		logger.Error("invalid connection:", err)
 	}
 	if disconnected {
 		debug("disconnected addr:", addr)
@@ -174,7 +174,7 @@ func (t *Server) serveConn(port int, conn net.Conn) {
 	}
 	disconnected, err := t.slaves.sendClose(port, conn.RemoteAddr().String())
 	if err != nil {
-		debug(err)
+		logger.Error(err)
 	}
 	if disconnected {
 		t.lnMgr.Remove(port)
@@ -188,7 +188,7 @@ func (t *Server) serveSlave(port int, reader *DataReader) {
 	debug("listen for slave, port:", port)
 	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
-		debug(err)
+		logger.Error(err)
 		t.sendMsg(port, err.Error())
 	}
 	t.lnMgr.Add(port, ln)
@@ -208,7 +208,7 @@ func (t *Server) serveSlave(port int, reader *DataReader) {
 			debug("connected", conn.RemoteAddr())
 			disconnected, err := t.slaves.sendConnect(port, conn.RemoteAddr().String())
 			if err != nil {
-				debug("Server.sererSlave sendConnect error:", err)
+				logger.Error("Server.sererSlave sendConnect error:", err)
 			}
 			if disconnected {
 				break
@@ -221,7 +221,7 @@ func (t *Server) serveSlave(port int, reader *DataReader) {
 	for {
 		d, isEnd, e := reader.ReadOne()
 		if e != nil {
-			debug("Server.serveSlave read from slave:", e)
+			logger.Error("Server.serveSlave read from slave:", e)
 		}
 		if isEnd {
 			break
