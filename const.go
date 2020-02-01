@@ -31,5 +31,5 @@ const (
 )
 
 const (
-	timeout = time.Second
+	timeout = 3 * time.Second
 )

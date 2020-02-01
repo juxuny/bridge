@@ -7,9 +7,10 @@ import (
 var verbose bool
 
 var logger = ler.NewLogger("[MAIN]")
+var _logger = ler.NewLogger("[MAIN]", 5)
 
 var log = func(v ...interface{}) {
-	logger.Debug(v...)
+	_logger.Debug(v...)
 }
 //var logf = fmt.Printf
 
