@@ -33,6 +33,7 @@ const (
 
 var (
 	timeout = 3 * time.Second
+	tickDuration = 5 * time.Second
 )
 
 func SetTimeout(duration time.Duration) {

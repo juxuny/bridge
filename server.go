@@ -137,11 +137,13 @@ func (t *Server) handleData(d Data) {
 	}
 }
 
-func (t *Server) handleTick(d Data){
+func (t *Server) handleTick(slaveConn net.Conn, d Data) {
 	debug("handleTick: ", d)
+	tickMsg := newTick("OK")
+	_ = tickMsg.Write(slaveConn)
 }
 
-func (t *Server) handle(d Data) {
+func (t *Server) handle(slaveConn net.Conn, d Data) {
 	switch d.Cmd {
 	case CmdMsg:
 		t.handleMsg(d)
@@ -150,7 +152,7 @@ func (t *Server) handle(d Data) {
 	case CmdClose:
 		t.handleClose(d)
 	case CmdTick:
-		t.handleTick(d)
+		t.handleTick(slaveConn, d)
 	}
 }
 
@@ -226,7 +228,7 @@ func (t *Server) serveSlave(port int, reader *DataReader) {
 		if isEnd {
 			break
 		}
-		t.handle(d)
+		t.handle(reader.conn, d)
 	}
 	t.unbindPort(port)
 	t.lnMgr.Remove(port)
@@ -267,6 +269,18 @@ func (t *slaveManager) Unbind(port int) {
 }
 
 func (t *slaveManager) sendMsg(port int, msg string) (disconnected bool, e error) {
+	conn, ok := t.GetConn(port)
+	if !ok {
+		disconnected = true
+		e = fmt.Errorf("connection not found")
+		return
+	}
+	m := newMsg(msg)
+	e = m.Write(conn)
+	return
+}
+
+func (t *slaveManager) sendTick(port int, msg string) (disconnected bool, e error) {
 	conn, ok := t.GetConn(port)
 	if !ok {
 		disconnected = true

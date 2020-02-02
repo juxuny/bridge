@@ -80,7 +80,7 @@ func (t *Data) Write(out io.Writer) (e error) {
 		return
 	}
 	buffer := bytes.NewBuffer(nil)
-	buffer.WriteByte(FlagStart)
+	buffer.WriteByte(FlagStart) // 协议包开始
 	for i := 0; i < len(data); i++ {
 		if data[i] == FlagStart {
 			buffer.WriteByte(FlagEsc)
@@ -92,7 +92,7 @@ func (t *Data) Write(out io.Writer) (e error) {
 			buffer.WriteByte(data[i])
 		}
 	}
-	buffer.WriteByte(FlagStart)
+	buffer.WriteByte(FlagStart) // 协议包结束
 	debug("send data:", len(buffer.Bytes()), buffer.Bytes())
 	_, e = out.Write(buffer.Bytes())
 	return
@@ -195,6 +195,13 @@ func init() {
 func newMsg(msg string) (ret Data) {
 	ret = Data{}
 	ret.Cmd = CmdMsg
+	ret.Data = []byte(msg)
+	return
+}
+
+func newTick(msg string) (ret Data) {
+	ret = Data{}
+	ret.Cmd = CmdTick
 	ret.Data = []byte(msg)
 	return
 }

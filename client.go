@@ -15,6 +15,9 @@ type Client struct {
 
 	connMgr *ConnManager
 	*sync.Mutex
+
+	sentTime time.Time
+	tickCh chan time.Time // 心跳包回应消息通知
 }
 
 func NewClient(c ClientConfig) (ret *Client) {
@@ -22,6 +25,7 @@ func NewClient(c ClientConfig) (ret *Client) {
 	ret.config = c
 	ret.connMgr = NewConnManager()
 	ret.Mutex = &sync.Mutex{}
+	ret.tickCh = make(chan time.Time, 1)
 	return
 }
 
@@ -95,6 +99,7 @@ func (t *Client) handleMsg(d Data) {
 func (t *Client) handleTick(d Data) {
 	msg := string(d.Data)
 	info(msg)
+	t.tickCh <- time.Now()
 }
 
 func (t *Client) handleData(d Data) {
@@ -184,13 +189,33 @@ func (t *Client) sendData(addr string, data []byte) (e error) {
 
 func (t *Client) startTickRunner() {
 	for {
-		time.Sleep(time.Second*5)
+		time.Sleep(tickDuration)
 		if err := t.sendTick(); err != nil {
 			info(err)
 			break
 		}
+		t.sentTime = time.Now() // 记录发送心跳的时间
+		go t.checkTimeout() // 异步检查超时
 	}
 	os.Exit(-1) //心跳失败，结束进程
+}
+
+
+func (t *Client) checkTimeout() {
+	tickerTimeout := time.NewTicker(timeout)
+	isTimeout := false
+	select {
+	case cur := <- t.tickCh:
+		if t.sentTime.Add(timeout).Before(cur) {
+			isTimeout = true
+		}
+	case <- tickerTimeout.C:
+		isTimeout = true
+	}
+	if isTimeout {
+		logger.Warn("ticker timeout")
+		os.Exit(-1)
+	}
 }
 
 func (t *Client) Start() {
