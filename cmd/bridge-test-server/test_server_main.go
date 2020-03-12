@@ -7,7 +7,14 @@ import (
 
 func serveConn(conn net.Conn) {
 	buffer := make([]byte, 1024)
-	conn.Write([]byte("welcome !!!"))
+	go func() {
+		for {
+			_, err := conn.Write([]byte("welcome !!!\n"))
+			if err != nil {
+				break
+			}
+		}
+	}()
 	for {
 		n, err := conn.Read(buffer)
 		if err != nil {
