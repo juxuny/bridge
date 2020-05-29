@@ -1,0 +1,22 @@
+version: "3.4"
+
+x-default: &default
+  logging:
+    options:
+      max-size: "5M"
+      max-file: "5"
+
+services:
+  ssh:
+    build:
+      context: .
+      dockerfile: bridge.dockerfile
+    restart: always
+    ports: 
+      - "10090:10090"
+      - "10022:10022"
+      - "10023:10023"
+      - "18888:18888"
+    volumes:
+      - ./server.conf.d:/app
+    <<: *default

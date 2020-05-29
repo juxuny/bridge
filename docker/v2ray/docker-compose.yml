@@ -1,0 +1,32 @@
+version: '3.4'
+
+x-env: &env
+  restart: always
+  logging:
+    options:
+      max-size: "5M"
+      max-file: "5"
+  networks:
+    - v_net
+
+services:
+  bridge:
+    build:
+      context: .
+      dockerfile: bridge.dockerfile
+    volumes:
+      - ./bridge.conf.d:/app
+    <<: *env
+
+  v2ray:
+    image: v2ray/official
+    volumes:
+      - ./v2ray.d:/etc/v2ray
+    ports:
+      - "10086:10086"
+    <<: *env
+
+networks:
+  v_net:
+    external:
+      name: v2ray 

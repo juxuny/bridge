@@ -1,0 +1,4 @@
+{
+  "port": 10090,
+  "tokenConf": "token.conf"
+}
