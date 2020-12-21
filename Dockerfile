@@ -10,4 +10,4 @@ FROM ineva/alpine:3.9
 WORKDIR /app
 COPY --from=builder /go/bin/bridge-server /app/bridge-server
 COPY --from=builder /go/bin/bridge-client /app/bridge-client
-ENTRYPOINT /app/bridge-server
+ENTRYPOINT /app/bridge-client
