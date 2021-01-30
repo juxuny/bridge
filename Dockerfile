@@ -3,8 +3,8 @@ WORKDIR /pro
 COPY . /pro
 ENV CGO_ENABLED 0
 RUN GOPROXY=https://goproxy.cn go mod download
-RUN go install github.com/juxuny/bridge/cmd/bridge-server && go install github.com/juxuny/bridge/cmd/bridge-client
-#ENTRYPOINT /go/bin/bridge-server
+RUN cd cmd/bridge-server && go build -o /go/bin/bridge-server && cd - 
+RUN cd cmd/bridge-client && go build -o /go/bin/bridge-client && cd -
 
 FROM ineva/alpine:3.9
 WORKDIR /app
